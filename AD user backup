@@ -1,0 +1,14 @@
+# Import the Active Directory module
+Import-Module ActiveDirectory
+
+# Specify the path for the backup file
+$backupPath = "C:\Path\to\backup.csv"
+
+# Export AD users to CSV
+Get-ADUser -Filter * -Properties * | Select-Object SamAccountName, DisplayName, EmailAddress, Enabled | Export-Csv -Path $backupPath -Force -NoTypeInformation
+
+# Export AD group members to CSV
+Get-ADGroup -Filter * | ForEach-Object {
+    $group = $_.Name
+    Get-ADGroupMember -Identity $group | Select-Object @{Name='GroupName';Expression={$group}}, SamAccountName, DisplayName | Export-Csv -Path $backupPath -Append -Force -NoTypeInformation
+}
